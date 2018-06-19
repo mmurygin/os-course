@@ -74,8 +74,8 @@ Nlist *_allocnlist(uint64_t addr, uint64_t value)
 {
     Nlist *nlist = malloc(sizeof(Nlist));
     nlist->next = NULL;
-    nlist->addr = 0;
-    nlist->value = 0;
+    nlist->addr = addr;
+    nlist->value = value;
 
     return nlist;
 }
