@@ -47,13 +47,9 @@ void query_memory(unsigned queries)
             puts("fault");
             continue;
         }
-
-        if (!has_addr(physical_addr))
+        else
         {
-            puts("0");
+            printf("%" SCNu64 "\n", physical_addr);
         }
-
-        uint64_t value = get_memory_value(physical_addr);
-        printf("%lu\n", value);
     }
 }

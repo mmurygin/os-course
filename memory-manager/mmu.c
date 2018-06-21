@@ -1,4 +1,5 @@
 #include "include/mmu.h"
+#include "include/memory-map.h"
 
 static uint64_t _root_table_addr;
 
