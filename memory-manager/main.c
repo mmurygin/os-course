@@ -6,7 +6,7 @@
 #include "include/memory-map.h"
 
 void fill_memory(unsigned memory_map_size);
-void query_memory(unsigned queries);
+void translate_local_addrs(unsigned queries);
 
 int main()
 {
@@ -18,7 +18,7 @@ int main()
 
     fill_memory(memory_map_size);
     set_root_table_addr(root_table_addr);
-    query_memory(queries);
+    translate_local_addrs(queries);
 
     return 0;
 }
@@ -34,7 +34,7 @@ void fill_memory(unsigned memory_map_size)
     }
 }
 
-void query_memory(unsigned queries)
+void translate_local_addrs(unsigned queries)
 {
     uint64_t logical_addr;
     uint64_t physical_addr;
