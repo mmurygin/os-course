@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}/bin/mmu",
             "args": [
                 "<",
-                "data/simple.txt"
+                "memory-manager/data/base.txt"
             ],
             "cwd": "${workspaceFolder}",
             "externalConsole": false,

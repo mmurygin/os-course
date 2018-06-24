@@ -15,7 +15,7 @@ uint64_t get_bits(uint64_t value, unsigned from, unsigned to)
 
 uint64_t get_table_record(uint64_t base_ptr, uint64_t index)
 {
-    uint64_t record_ptr = base_ptr + 64 * index;
+    uint64_t record_ptr = base_ptr + 8 * index;
 
     return get_memory_value(record_ptr);
 }

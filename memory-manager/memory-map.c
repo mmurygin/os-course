@@ -5,7 +5,7 @@
 
 #include "include/memory-map.h"
 
-#define HASH_TABLE_SIZE 1000
+#define HASH_TABLE_SIZE 100000
 
 static Nlist *hashtable[HASH_TABLE_SIZE] = {};
 
