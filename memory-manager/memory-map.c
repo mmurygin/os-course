@@ -51,8 +51,7 @@ uint64_t _get_memory_value(Nlist *nlist, uint64_t addr)
 {
     if (!nlist)
     {
-        fprintf(stderr, "Try to get not existed addr: %" SCNu64 "\n", addr);
-        exit(1);
+        return 0;
     }
 
     if (nlist->addr == addr)
