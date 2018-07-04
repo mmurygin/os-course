@@ -9,6 +9,8 @@ int main()
 
     printf("Initial range is [%p, %p]\n", buf, (char*) buf + buf_size);
 
+    mysetup(buf, buf_size);
+
     void *pointers[10] = { NULL };
 
     for (int i = 0; i < 10; i++)

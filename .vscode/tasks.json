@@ -14,6 +14,18 @@
                 "$gcc"
             ],
             "group": "build"
+        },
+        {
+            "label": "alloc",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "alloc"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
         }
     ]
 }

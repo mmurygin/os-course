@@ -36,17 +36,26 @@ void mysetup(void *buf, size_t size)
 
 void *myalloc(size_t size)
 {
-    FreeUnit * free_unit = get_free_unit(free_units_head, size);
+    size_t required_size = size - free_unit_extras() + busy_unit_extras();
+    FreeUnit *free_unit = get_free_unit(free_units_head, required_size);
 
     if (!free_unit)
     {
         return NULL;
     }
 
-    if (free_unit->size = size)
+    if (free_unit->size = required_size)
     {
-        // TODO(MM): handle if free_unit == free_units_head
+        if (free_unit->prev)
+        {
+            free_unit->prev->next = free_unit->next;
+        }
+        else if (free_unit == free_units_head)
+        {
+            free_units_head = NULL;
+        }
 
+        init_busy_unit((BusyUnit*)free_unit, size);
     }
 
     BusyUnit * busy_unit = split_free_unit(free_unit, size);

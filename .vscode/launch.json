@@ -17,6 +17,16 @@
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
             "MIMode": "gdb",
+        },
+        {
+            "name": "alloc",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "alloc",
+            "program": "${workspaceFolder}/bin/alloc",
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
         }
     ]
 }
