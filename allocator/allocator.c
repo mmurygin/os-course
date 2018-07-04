@@ -17,9 +17,11 @@ typedef struct busy_unit {
 } BusyUnit;
 
 static FreeUnit *free_units_head;
+static void * left_ptr;
+static void * right_ptr;
 
-size_t free_unit_extras();
 size_t busy_unit_extras();
+size_t free_unit_extras();
 
 void init_free_unit(FreeUnit *free_unit, size_t available_size);
 void init_busy_unit(BusyUnit *busy_unit, size_t size);
@@ -28,28 +30,32 @@ BusyUnit * split_free_unit(FreeUnit * free_unit, size_t busy_unit_size);
 
 void mysetup(void *buf, size_t size)
 {
+    left_ptr = buf;
+    right_ptr = (char*) buf + size;
     free_units_head = (FreeUnit*) buf;
 
-    size_t real_size = size - free_unit_extras();
+    size_t real_size = size - busy_unit_extras();
     init_free_unit(free_units_head, real_size);
 }
 
 void *myalloc(size_t size)
 {
-    if (size == 0)
+    // regarding the task we do not support allocating less than 16b
+    if (size < 16)
     {
         return NULL;
     }
 
-    size_t required_size = size - free_unit_extras() + busy_unit_extras();
-    FreeUnit *free_unit = get_free_unit(free_units_head, required_size);
+    FreeUnit *free_unit = get_free_unit(free_units_head, size);
 
     if (!free_unit)
     {
         return NULL;
     }
 
-    if (free_unit->size == required_size)
+    BusyUnit * busy_unit = NULL;
+
+    if (free_unit->size <= size + free_unit_extras() - busy_unit_extras())
     {
         if (free_unit->prev)
         {
@@ -57,19 +63,71 @@ void *myalloc(size_t size)
         }
         else if (free_unit == free_units_head)
         {
-            free_units_head = NULL;
+            free_units_head = free_unit->next;
         }
 
-        init_busy_unit((BusyUnit*)free_unit, size);
+        busy_unit = (BusyUnit *)free_unit;
+        init_busy_unit(busy_unit, free_unit->size);
     }
-
-    BusyUnit * busy_unit = split_free_unit(free_unit, size);
+    else
+    {
+        busy_unit = split_free_unit(free_unit, size);
+    }
 
     return (char*) busy_unit + sizeof(BusyUnit);
 }
 
 void myfree(void *p)
 {
+    BusyUnit *busy_unit = (BusyUnit*)((char*)p - sizeof(BusyUnit));
+
+    if (p > left_ptr)
+    {
+        EndHeader *left_header = (EndHeader*)((char*)busy_unit - sizeof(EndHeader));
+
+        if (left_header->is_free)
+        {
+            FreeUnit* free_unit = (FreeUnit*)((char*)left_header - left_header->size);
+            if (free_unit->prev)
+            {
+                free_unit->prev->next = free_unit->next;
+            }
+
+            busy_unit = (BusyUnit*)free_unit;
+            size_t merged_size = free_unit->size + busy_unit->size + busy_unit_extras();
+            init_busy_unit(busy_unit, merged_size);
+        }
+    }
+
+    if (p < right_ptr)
+    {
+        EndHeader *right_header = (EndHeader*)((char *)busy_unit + busy_unit->size);
+
+        if (right_header->is_free)
+        {
+            FreeUnit *free_unit = (FreeUnit*)((char *)right_header - right_header->size +
+                sizeof(EndHeader));
+
+            if (free_unit->prev)
+            {
+                free_unit->prev->next = free_unit->next;
+            }
+
+            busy_unit = (BusyUnit *)free_unit;
+            size_t merged_size = free_unit->size + busy_unit->size + busy_unit_extras();
+            init_busy_unit(busy_unit, merged_size);
+        }
+    }
+
+    FreeUnit *new_free_unit = (FreeUnit*)busy_unit;
+    size_t new_free_unit_size = busy_unit->size;
+
+    new_free_unit->size = busy_unit->size;
+    new_free_unit->prev = NULL;
+    new_free_unit->next = free_units_head;
+
+    free_units_head->prev = new_free_unit;
+    free_units_head = new_free_unit;
 
 }
 
@@ -89,7 +147,7 @@ void init_free_unit(FreeUnit *free_unit, size_t size)
     free_unit->next = NULL;
     free_unit->size = size;
 
-    char *buffer_end = (char *)free_unit + size + free_unit_extras();
+    char *buffer_end = (char *)free_unit + size + busy_unit_extras();
     create_end_header(buffer_end, size, true);
 }
 
@@ -101,7 +159,7 @@ void init_busy_unit(BusyUnit * busy_unit, size_t size)
     busy_unit->size = size;
 
     char *buffer_end = (char *)busy_unit + size + busy_unit_extras();
-    create_end_header(buffer_end, size, true);
+    create_end_header(buffer_end, size, false);
 }
 
 FreeUnit * get_free_unit(FreeUnit * free_unit, size_t size)
@@ -129,15 +187,15 @@ size_t busy_unit_extras()
     return sizeof(BusyUnit) + sizeof(EndHeader);
 }
 
-BusyUnit *split_free_unit(FreeUnit *free_unit, size_t busy_unit_size)
+BusyUnit *split_free_unit(FreeUnit *free_unit, size_t size)
 {
-    size_t taken_size = busy_unit_size + busy_unit_extras();
+    size_t taken_size = size + busy_unit_extras();
     size_t remained_size = free_unit->size - taken_size;
 
     init_free_unit(free_unit, remained_size);
 
-    BusyUnit *busy_unit = (BusyUnit*)((char*) free_unit + free_unit->size + free_unit_extras());
-    init_busy_unit(busy_unit, busy_unit_size);
+    BusyUnit *busy_unit = (BusyUnit*)((char*) free_unit + free_unit->size + busy_unit_extras());
+    init_busy_unit(busy_unit, size);
 
     return busy_unit;
 }
