@@ -17,6 +17,7 @@ typedef struct free_unit
 static FreeUnit *free_units_head;
 static void * left_ptr;
 static void * right_ptr;
+static size_t min_size;
 
 size_t busy_unit_extras();
 size_t free_unit_extras();
@@ -31,6 +32,7 @@ void mysetup(void *buf, size_t size)
     left_ptr = buf;
     right_ptr = (char*) buf + size;
     free_units_head = (FreeUnit*) buf;
+    min_size = free_unit_extras() - busy_unit_extras();
 
     size_t real_size = size - busy_unit_extras();
     init_free_unit(free_units_head, real_size);
@@ -38,10 +40,14 @@ void mysetup(void *buf, size_t size)
 
 void *myalloc(size_t size)
 {
-    // regarding the task we do not support allocating less than 16b
-    if (size <= 16)
+    if (size == 0)
     {
         return NULL;
+    }
+
+    if (size < min_size)
+    {
+        size = min_size;
     }
 
     FreeUnit *free_unit = get_free_unit(free_units_head, size);
@@ -149,7 +155,7 @@ void create_end_header(const Header *start_header)
 }
 
 /*
-| *prev | *next | size  | ------------------------- | size | is_free |
+| size | is_free | *prev | *next |  ------------------------- | size | is_free |
 */
 void init_free_unit(FreeUnit *free_unit, size_t size)
 {
@@ -162,7 +168,7 @@ void init_free_unit(FreeUnit *free_unit, size_t size)
 }
 
 /*
-| size | ------------------------- | size | is_free |
+| size| is_free | ------------------------- | size | is_free |
 */
 void init_busy_unit(Header *busy_unit, size_t size)
 {
