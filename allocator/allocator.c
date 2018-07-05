@@ -89,10 +89,14 @@ void myfree(void *p)
 
         if (left_header->is_free)
         {
-            FreeUnit* free_unit = (FreeUnit*)((char*)left_header - left_header->size);
+            FreeUnit* free_unit = (FreeUnit*)((char*)left_header - left_header->size - sizeof(Header));
             if (free_unit->prev)
             {
                 free_unit->prev->next = free_unit->next;
+            }
+            else
+            {
+                free_units_head = free_unit->next;
             }
 
             size_t merged_size = free_unit->header.size + busy_unit->size + busy_unit_extras();
@@ -115,10 +119,13 @@ void myfree(void *p)
             {
                 free_unit->prev->next = free_unit->next;
             }
+            else
+            {
+                free_units_head = free_unit->next;
+            }
 
             size_t merged_size = free_unit->header.size + busy_unit->size + busy_unit_extras();
 
-            busy_unit = &free_unit->header;
             init_busy_unit(busy_unit, merged_size);
         }
     }
@@ -127,7 +134,10 @@ void myfree(void *p)
     init_free_unit(new_free_unit, busy_unit->size);
 
     new_free_unit->next = free_units_head;
-    free_units_head->prev = new_free_unit;
+    if (free_units_head)
+    {
+        free_units_head->prev = new_free_unit;
+    }
     free_units_head = new_free_unit;
 }
 

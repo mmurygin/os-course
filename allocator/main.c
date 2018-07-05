@@ -2,30 +2,59 @@
 #include <stdlib.h>
 #include "allocator.h"
 
+void test_sequential_allocation();
+void test_alloc_free();
+
 int main()
 {
-    size_t buf_size = 100 * 1024;
+    size_t buf_size = 524288;
     void * buf = malloc(buf_size);
 
     printf("Initial range is [%p, %p]\n", buf, (char*) buf + buf_size);
 
     mysetup(buf, buf_size);
 
-    void *pointers[10] = { NULL };
+    test_alloc_free();
+    // test_sequential_allocation();
 
-    for (int i = 0; i < 10; i++)
+    free(buf);
+
+    return 0;
+}
+
+#define ATTEMPTS 3
+
+void test_sequential_allocation()
+{
+    void *pointers[ATTEMPTS] = { NULL };
+
+    for (int i = 0; i < ATTEMPTS; i++)
     {
         pointers[i] = myalloc(i * 100);
         printf("alloc: %p\n", pointers[i]);
     }
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < ATTEMPTS; i++)
     {
         myfree(pointers[i]);
         printf("free: %p\n", pointers[i]);
     }
+}
 
-    free(buf);
+void test_alloc_free()
+{
+    void *ptr = myalloc(1000000);
+    printf("alloc: %p\n", ptr);
+    myfree(ptr);
+    printf("free: %p\n", ptr);
 
-    return 0;
+    ptr = myalloc(500000);
+    printf("alloc: %p\n", ptr);
+    myfree(ptr);
+    printf("free: %p\n", ptr);
+
+    ptr = myalloc(250000);
+    printf("alloc: %p\n", ptr);
+    myfree(ptr);
+    printf("free: %p\n", ptr);
 }
