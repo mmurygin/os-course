@@ -16,12 +16,13 @@ int main()
     for (int i = 0; i < 10; i++)
     {
         pointers[i] = myalloc(i * 100);
-        printf("%p\n", pointers[i]);
+        printf("alloc: %p\n", pointers[i]);
     }
 
     for (int i = 0; i < 10; i++)
     {
         myfree(pointers[i]);
+        printf("free: %p\n", pointers[i]);
     }
 
     free(buf);

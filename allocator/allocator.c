@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include "allocator.h"
+#include <stdlib.h>
 
 typedef struct header
 {
@@ -95,8 +95,9 @@ void myfree(void *p)
                 free_unit->prev->next = free_unit->next;
             }
 
-            busy_unit = (Header*)free_unit;
             size_t merged_size = free_unit->header.size + busy_unit->size + busy_unit_extras();
+
+            busy_unit = (Header*)free_unit;
             init_busy_unit(busy_unit, merged_size);
         }
     }
@@ -115,18 +116,17 @@ void myfree(void *p)
                 free_unit->prev->next = free_unit->next;
             }
 
-            busy_unit = &free_unit->header;
             size_t merged_size = free_unit->header.size + busy_unit->size + busy_unit_extras();
+
+            busy_unit = &free_unit->header;
             init_busy_unit(busy_unit, merged_size);
         }
     }
 
     FreeUnit *new_free_unit = (FreeUnit*)busy_unit;
+    init_free_unit(new_free_unit, busy_unit->size);
 
-    new_free_unit->header.size = busy_unit->size;
-    new_free_unit->prev = NULL;
     new_free_unit->next = free_units_head;
-
     free_units_head->prev = new_free_unit;
     free_units_head = new_free_unit;
 }
