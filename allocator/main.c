@@ -7,7 +7,7 @@ void test_alloc_free();
 
 int main()
 {
-    size_t buf_size = 524288;
+    size_t buf_size = 1000;
     void * buf = malloc(buf_size);
 
     printf("Initial range is [%p, %p]\n", buf, (char*) buf + buf_size);
@@ -15,7 +15,7 @@ int main()
     mysetup(buf, buf_size);
 
     test_alloc_free();
-    // test_sequential_allocation();
+    test_sequential_allocation();
 
     free(buf);
 
