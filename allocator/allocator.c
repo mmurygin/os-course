@@ -171,7 +171,7 @@ void init_free_unit(FreeUnit *free_unit, size_t size, FreeUnit *prev, FreeUnit *
     free_unit->header.size = size;
     free_unit->header.is_free = true;
 
-    create_end_header(&free_unit->header);
+    create_end_header(&(free_unit->header));
 }
 
 /*
