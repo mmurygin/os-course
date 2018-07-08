@@ -67,8 +67,9 @@ static void * allocated[RANDOM_ATTEMPTS] = { NULL };
 
 void free_by_index(int index)
 {
-    printf("free: [%d: %p]\n", index, allocated[index]);
+    printf("Started Freeing: %p\n", allocated[index]);
     myfree(allocated[index]);
+    printf("Finished Freeing: %p\n", allocated[index]);
     allocated[index] = NULL;
 }
 
@@ -87,9 +88,9 @@ void test_random_alloc_malloc()
         if (alloc_number > 0)
         {
             size_t size = rand() % 1000;
-            printf("before alloc: [%d, %d]\n", index, (int)size);
+            printf("Started Allocating: %d bytes\n", (int)size);
             allocated[index] = myalloc(size);
-            printf("allocated: [%d, %p]\n", index, allocated[index]);
+            printf("Finished Allocating %d bytes. Result: [%p]\n", (int)size, allocated[index]);
         }
     }
 }

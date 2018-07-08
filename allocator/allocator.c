@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct header
@@ -28,6 +29,8 @@ void merge_right_unit(Header *busy_unit);
 Header * merge_left_unit(Header *busy_unit);
 FreeUnit *get_free_unit(FreeUnit *header, size_t size);
 Header * split_free_unit(FreeUnit * free_unit, size_t busy_unit_size);
+void print_header(Header *header, int tabs);
+void print_free_unit(FreeUnit *free_unit, int tabs);
 
 void mysetup(void *buf, size_t size)
 {
@@ -59,10 +62,14 @@ void *myalloc(size_t size)
         return NULL;
     }
 
+    printf("\tGot free unit\n");
+    print_free_unit(free_unit, 2);
+
     Header *busy_unit = NULL;
 
-    if (free_unit->header.size <= size + min_size)
+    if (free_unit->header.size <= size + min_size + busy_unit_extras())
     {
+        printf("\tconvert the whole free unit to busy");
         if (free_unit->prev)
         {
             free_unit->prev->next = free_unit->next;
@@ -77,6 +84,7 @@ void *myalloc(size_t size)
     }
     else
     {
+        printf("\tSplit Unit: %p\n", free_unit);
         busy_unit = split_free_unit(free_unit, size);
     }
 
@@ -171,7 +179,7 @@ void init_free_unit(FreeUnit *free_unit, size_t size, FreeUnit *prev, FreeUnit *
     free_unit->header.size = size;
     free_unit->header.is_free = true;
 
-    create_end_header(&(free_unit->header));
+    create_end_header(&free_unit->header);
 }
 
 /*
@@ -216,9 +224,31 @@ Header *split_free_unit(FreeUnit *free_unit, size_t size)
     size_t remained_size = free_unit->header.size - taken_size;
 
     init_free_unit(free_unit, remained_size, free_unit->prev, free_unit->next);
+    printf("\t\tFreeUnit:\n");
+    print_free_unit(free_unit, 3);
 
     Header *busy_unit = (Header*)((char*)free_unit + free_unit->header.size + busy_unit_extras());
     init_busy_unit(busy_unit, size);
+    printf("\t\tBusyUnit:\n");
+    print_header(busy_unit, 3);
 
     return busy_unit;
+}
+
+void print_header(Header *header, int tabs)
+{
+    while (tabs--) putchar('\t');
+
+    Header *end_header = (Header*)((char*)header + header->size + sizeof(Header));
+
+    printf("%p: | %zu | %d | --------------- | %zu | %d |\n", header, header->size,
+        header->is_free, end_header->size, end_header->is_free);
+}
+
+void print_free_unit(FreeUnit *free_unit, int tabs)
+{
+    print_header(&free_unit->header, tabs);
+
+    while (tabs--) putchar('\t');
+    printf("%p - X-  %p\n", free_unit->prev, free_unit->next);
 }
