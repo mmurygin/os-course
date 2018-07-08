@@ -61,7 +61,7 @@ void *myalloc(size_t size)
 
     Header *busy_unit = NULL;
 
-    if (free_unit->header.size <= size + min_size)
+    if (free_unit->header.size <= size + min_size + busy_unit_extras())
     {
         if (free_unit->prev)
         {
