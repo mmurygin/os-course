@@ -69,7 +69,7 @@ void *myalloc(size_t size)
 
     if (free_unit->header.size <= size + min_size + busy_unit_extras())
     {
-        printf("\tconvert the whole free unit to busy");
+        printf("\tConvert the whole free unit to busy\n");
         if (free_unit->prev)
         {
             free_unit->prev->next = free_unit->next;
@@ -81,12 +81,16 @@ void *myalloc(size_t size)
 
         busy_unit = (Header *)free_unit;
         init_busy_unit(busy_unit, free_unit->header.size);
+        print_header(busy_unit, 2);
     }
     else
     {
         printf("\tSplit Unit: %p\n", free_unit);
         busy_unit = split_free_unit(free_unit, size);
     }
+
+    printf("\tHeader:\n");
+    print_free_unit(free_units_head, 2);
 
     return (char*) busy_unit + sizeof(Header);
 }
@@ -98,17 +102,21 @@ void myfree(void *p)
         return;
     }
 
+    printf("Start cleaning:\n");
+
     Header *busy_unit = (Header*)((char*)p - sizeof(Header));
+    print_header(busy_unit, 1);
+
     busy_unit = merge_left_unit(busy_unit);
     merge_right_unit(busy_unit);
 
     FreeUnit *new_free_unit = (FreeUnit*)busy_unit;
     init_free_unit(new_free_unit, busy_unit->size, NULL, NULL);
 
-    new_free_unit->next = free_units_head;
     if (free_units_head)
     {
         free_units_head->prev = new_free_unit;
+        new_free_unit->next = free_units_head;
     }
     free_units_head = new_free_unit;
 }
@@ -118,7 +126,9 @@ Header * merge_left_unit(Header *busy_unit)
     Header *left_header = (Header *)((char *)busy_unit - sizeof(Header));
     if ((void*)left_header > left_border && left_header->is_free)
     {
+        printf("\tMerge Left With:\n");
         FreeUnit *free_unit = (FreeUnit *)((char *)left_header - left_header->size - sizeof(Header));
+        print_free_unit(free_unit, 2);
         if (free_unit->prev)
         {
             free_unit->prev->next = free_unit->next;
@@ -132,6 +142,8 @@ Header * merge_left_unit(Header *busy_unit)
 
         Header * merged_unit = (Header *)free_unit;
         init_busy_unit(merged_unit, merged_size);
+        printf("\tMerge Left Result:\n");
+        print_header(merged_unit, 2);
 
         return merged_unit;
     }
@@ -146,6 +158,8 @@ void merge_right_unit(Header * busy_unit)
     if ((void*)right_header < right_border && right_header->is_free)
     {
         FreeUnit *free_unit = (FreeUnit *)right_header;
+        printf("\tMerge Right With:\n");
+        print_free_unit(free_unit, 2);
 
         if (free_unit->prev)
         {
@@ -159,6 +173,9 @@ void merge_right_unit(Header * busy_unit)
         size_t merged_size = free_unit->header.size + busy_unit->size + busy_unit_extras();
 
         init_busy_unit(busy_unit, merged_size);
+
+        printf("\tMerge Right Result:\n");
+        print_header(busy_unit, 2);
     }
 }
 
@@ -250,5 +267,5 @@ void print_free_unit(FreeUnit *free_unit, int tabs)
     print_header(&free_unit->header, tabs);
 
     while (tabs--) putchar('\t');
-    printf("%p - X-  %p\n", free_unit->prev, free_unit->next);
+    printf("[%p, %p]\n", free_unit->prev, free_unit->next);
 }
