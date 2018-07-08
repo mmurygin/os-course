@@ -167,6 +167,11 @@ void init_busy_unit(Header *busy_unit, size_t size)
 
 FreeUnit * get_free_unit(FreeUnit * free_unit, size_t size)
 {
+    if (!free_unit)
+    {
+        return NULL;
+    }
+
     if (free_unit->header.size >= size)
     {
         return free_unit;
