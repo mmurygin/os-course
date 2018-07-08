@@ -62,7 +62,7 @@ void test_alloc_free()
     printf("free: %p\n", ptr);
 }
 
-#define RANDOM_ATTEMPTS 100
+#define RANDOM_ATTEMPTS 10000
 static void * allocated[RANDOM_ATTEMPTS] = { NULL };
 
 void free_by_index(int index)

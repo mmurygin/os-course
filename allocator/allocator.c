@@ -28,6 +28,7 @@ void merge_right_unit(Header *busy_unit);
 Header * merge_left_unit(Header *busy_unit);
 FreeUnit *get_free_unit(FreeUnit *header, size_t size);
 Header * split_free_unit(FreeUnit * free_unit, size_t busy_unit_size);
+void unlink_free_unit(const FreeUnit *free_unit);
 
 void mysetup(void *buf, size_t size)
 {
@@ -63,14 +64,7 @@ void *myalloc(size_t size)
 
     if (free_unit->header.size <= size + min_size + busy_unit_extras())
     {
-        if (free_unit->prev)
-        {
-            free_unit->prev->next = free_unit->next;
-        }
-        else
-        {
-            free_units_head = free_unit->next;
-        }
+        unlink_free_unit(free_unit);
 
         busy_unit = (Header *)free_unit;
         init_busy_unit(busy_unit, free_unit->header.size);
@@ -111,14 +105,7 @@ Header * merge_left_unit(Header *busy_unit)
     if ((void*)left_header > left_border && left_header->is_free)
     {
         FreeUnit *free_unit = (FreeUnit *)((char *)left_header - left_header->size - sizeof(Header));
-        if (free_unit->prev)
-        {
-            free_unit->prev->next = free_unit->next;
-        }
-        else
-        {
-            free_units_head = free_unit->next;
-        }
+        unlink_free_unit(free_unit);
 
         size_t merged_size = free_unit->header.size + busy_unit->size + busy_unit_extras();
 
@@ -139,14 +126,7 @@ void merge_right_unit(Header * busy_unit)
     {
         FreeUnit *free_unit = (FreeUnit *)right_header;
 
-        if (free_unit->prev)
-        {
-            free_unit->prev->next = free_unit->next;
-        }
-        else
-        {
-            free_units_head = free_unit->next;
-        }
+        unlink_free_unit(free_unit);
 
         size_t merged_size = free_unit->header.size + busy_unit->size + busy_unit_extras();
 
@@ -221,4 +201,21 @@ Header *split_free_unit(FreeUnit *free_unit, size_t size)
     init_busy_unit(busy_unit, size);
 
     return busy_unit;
+}
+
+void unlink_free_unit(const FreeUnit *free_unit)
+{
+    if (free_unit->next)
+    {
+        free_unit->next->prev = free_unit->prev;
+    }
+
+    if (free_unit->prev)
+    {
+        free_unit->prev->next = free_unit->next;
+    }
+    else
+    {
+        free_units_head = free_unit->next;
+    }
 }
