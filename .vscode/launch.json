@@ -27,6 +27,20 @@
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
             "MIMode": "gdb",
+        },
+        {
+            "name": "planner",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "planner",
+            "program": "${workspaceFolder}/bin/planner",
+            "args": [
+                "<",
+                "simple-planner/data/base.txt"
+            ],
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
         }
     ]
 }

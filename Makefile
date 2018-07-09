@@ -8,5 +8,5 @@ slab-allocator:
 	gcc -g3 -o0 slab-allocator/main.c slab-allocator/allocator.c -o ./bin/sl-alloc
 
 planner:
-	gcc simple-planner/main.c -o ./bin/planner
+	gcc -g3 -o0 simple-planner/main.c -o ./bin/planner
 

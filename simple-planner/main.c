@@ -1,37 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define MAX_ARRAY_SIZE 10000
-
-void quick_sort(int *arr, int *indexes, int len);
-int init_array_from_line(int *arr, const char *line);
-void init_indexes_array(int *arr, int size);
-void print_array(const int *arr, int len);
+void quick_sort(unsigned *arr, unsigned *indexes, unsigned len);
+void read_array_from_stdin(unsigned *arr, unsigned size);
+void init_indexes_array(unsigned *arr, unsigned size);
+void print_array(const unsigned *arr, unsigned len);
 
 int main()
 {
-    int requests;
-    scanf("%d\n", &requests);
+    unsigned length;
+    scanf("%u\n", &length);
 
-    char *buffer = NULL;
-    size_t len = 0;
+    unsigned *arr = calloc(length, sizeof(unsigned));
+    read_array_from_stdin(arr, length);
 
-    int * arr = calloc(MAX_ARRAY_SIZE, sizeof(int));
-    int * indexes_array = calloc(MAX_ARRAY_SIZE, sizeof(int));
-    int real_length = 0;
-    while (requests--)
-    {
-        getline(&buffer, &len, stdin);
-        real_length = init_array_from_line(arr, buffer);
-        init_indexes_array(indexes_array, real_length);
+    unsigned * indexes_array = calloc(length, sizeof(unsigned));
+    init_indexes_array(indexes_array, length);
 
-        quick_sort(arr, indexes_array, real_length);
-        print_array(indexes_array, real_length);
-
-        free(buffer);
-        buffer = NULL;
-        real_length = 0;
-    }
+    quick_sort(arr, indexes_array, length);
+    print_array(indexes_array, length);
 
     free(arr);
     free(indexes_array);
@@ -39,9 +26,9 @@ int main()
     return 0;
 }
 
-void swap(int *arr, int *indexes, int from, int to)
+void swap(unsigned *arr, unsigned *indexes, unsigned from, unsigned to)
 {
-    int arr_tmp = arr[from];
+    unsigned arr_tmp = arr[from];
     arr[from] = arr[to];
     arr[to] = arr_tmp;
 
@@ -50,9 +37,9 @@ void swap(int *arr, int *indexes, int from, int to)
     indexes[to] = arr_tmp;
 }
 
-void print_array(const int *arr, int len)
+void print_array(const unsigned *arr, unsigned len)
 {
-    for (int i = 0; i < len; i++)
+    for (unsigned i = 0; i < len; i++)
     {
         printf("%d ", arr[i]);
     }
@@ -60,28 +47,23 @@ void print_array(const int *arr, int len)
     putchar('\n');
 }
 
-int init_array_from_line(int *arr, const char *line)
+void read_array_from_stdin(unsigned *arr, unsigned size)
 {
-    int el;
-    int index = 0;
-
-    while (sscanf(line, "%d", &el))
+    for (unsigned i = 0; i < size; i++)
     {
-        arr[index++] = el;
+        scanf("%u", &arr[i]);
     }
-
-    return index;
 }
 
-void init_indexes_array(int *arr, int size)
+void init_indexes_array(unsigned *arr, unsigned size)
 {
-    for (int i = 0; i < size; i++)
+    for (unsigned i = 0; i < size; i++)
     {
         arr[i] = i;
     }
 }
 
-void quick_sort(int *arr, int *indexes, int len)
+void quick_sort(unsigned *arr, unsigned *indexes, unsigned len)
 {
     return;
 }

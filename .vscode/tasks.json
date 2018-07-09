@@ -26,6 +26,18 @@
                 "$gcc"
             ],
             "group": "build"
+        },
+        {
+            "label": "planner",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "planner"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
         }
     ]
 }
