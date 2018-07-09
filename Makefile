@@ -3,3 +3,10 @@ mmu:
 
 alloc:
 	gcc -g3 -o0 allocator/main.c allocator/allocator.c -o ./bin/alloc
+
+slab-allocator:
+	gcc -g3 -o0 slab-allocator/main.c slab-allocator/allocator.c -o ./bin/sl-alloc
+
+planner:
+	gcc simple-planner/main.c -o ./bin/planner
+
