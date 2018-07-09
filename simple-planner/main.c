@@ -68,16 +68,21 @@ void quick_sort(unsigned *from, unsigned *to, unsigned *ifrom, unsigned *ito)
 
     int len = to - from;
     int pivot = len - 1;
+    int el = from[pivot];
 
     for (int i = len - 1; i > 0; --i)
     {
-        if (from[i - 1] > from[pivot])
+        if (from[i - 1] > el)
         {
+            pivot--;
             swap(from, i - 1, pivot);
             swap(ifrom, i - 1, pivot);
-            pivot = i - 1;
+
         }
     }
+
+    swap(from, pivot, len - 1);
+    swap(ifrom, pivot, len - 1);
 
     quick_sort(from, from + pivot, ifrom, ifrom + pivot);
     quick_sort(from + pivot + 1, to, ifrom + pivot + 1, ito);
