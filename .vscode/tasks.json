@@ -28,11 +28,11 @@
             "group": "build"
         },
         {
-            "label": "planner",
+            "label": "prioritizer",
             "type": "shell",
             "command": "make",
             "args": [
-                "planner"
+                "prioritizer"
             ],
             "problemMatcher": [
                 "$gcc"

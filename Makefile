@@ -5,10 +5,10 @@ alloc:
 	gcc -g3 -o0 allocator/main.c allocator/allocator.c -o ./bin/alloc
 
 slab-allocator:
-	gcc -g3 -o0 slab-allocator/main.c slab-allocator/allocator.c -o ./bin/sl-alloc
+	gcc -g3 -o0 -lm slab-allocator/main.c slab-allocator/allocator.c slab-allocator/slab.c -o ./bin/sl-alloc
 
-planner:
-	gcc -g3 -o0 simple-planner/main.c -o ./bin/planner
+prioritizer:
+	gcc -g3 -o0 prioritizer/main.c -o ./bin/prioritizer
 
 rr-scheduler:
 	g++ -std=c++11 round-robin-scheduler/main.cpp round-robin-scheduler/scheduler.cpp -o bin/scheduler
