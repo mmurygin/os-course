@@ -10,3 +10,6 @@ slab-allocator:
 planner:
 	gcc -g3 -o0 simple-planner/main.c -o ./bin/planner
 
+rr-scheduler:
+	g++ -std=c++11 round-robin-scheduler/main.cpp round-robin-scheduler/scheduler.cpp -o bin/scheduler
+
