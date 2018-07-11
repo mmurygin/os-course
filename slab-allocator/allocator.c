@@ -2,6 +2,11 @@
 #include "allocator.h"
 #include "slab.h"
 
+typedef struct _free_slab {
+    void *slab;
+    struct _free_slab *next;
+} FreeSlab;
+
 /**
  * Функция инициализации будет вызвана перед тем, как
  * использовать это кеширующий аллокатор для аллокации.
@@ -12,7 +17,8 @@
  **/
 void cache_setup(struct cache *cache, size_t object_size)
 {
-    /* Реализуйте эту функцию. */
+    cache->object_size = object_size;
+    cache->slab_objects = get_objects_in_slab()
 }
 
 /**

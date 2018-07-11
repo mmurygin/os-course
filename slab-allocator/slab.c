@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 #include "slab.h"
 
@@ -28,4 +27,9 @@ void *alloc_slab(int order)
 void free_slab(void *slab)
 {
     free(slab);
+}
+
+size_t get_objects_in_slab(int order, size_t object_size)
+{
+    return PAGE_SIZE * pow(2, order) / object_size;
 }
