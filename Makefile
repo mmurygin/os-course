@@ -13,3 +13,6 @@ prioritizer:
 rr-scheduler:
 	g++ -std=c++11 round-robin-scheduler/main.cpp round-robin-scheduler/scheduler.cpp -o bin/scheduler
 
+elfreader:
+	g++ -std=c++11 elf-reader/main.cpp elf-reader/reader.cpp -o bin/elf-reader
+

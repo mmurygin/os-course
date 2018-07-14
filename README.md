@@ -5,3 +5,4 @@
 1. [slab-allocator](https://stepik.org/lesson/44330/step/6?unit=22139)
 1. [prioritizer](https://stepik.org/lesson/44336/step/5?unit=22148)
 1. [round-robin-scheduler](https://stepik.org/lesson/44337/step/3?unit=22150)
+1. [elf-reader](https://stepik.org/lesson/44344/step/13?unit=22153)
