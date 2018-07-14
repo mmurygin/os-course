@@ -56,9 +56,12 @@ std::uintptr_t entry_point(const char *name)
 
     std::fread(header, bites_to_read, 1, file);
 
+    uintptr_t entry = header->e_entry;
+
+    std::free(header);
     std::fclose(file);
 
-    return header->e_entry;
+    return entry;
 }
 
 std::size_t space(const char *name)
@@ -95,6 +98,8 @@ std::size_t space(const char *name)
         }
     }
 
+    std::free(header);
+    std::free(pg_header);
     std::fclose(file);
 
     return sum;
