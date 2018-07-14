@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 #define ELF_NIDENT 16
 
@@ -40,12 +42,60 @@ struct elf_phdr
 
 std::uintptr_t entry_point(const char *name)
 {
-    // Ваш код здесь, name - имя ELF файла.
+    std::FILE *file = std::fopen(name, "r");
+
+    if (!file)
+    {
+        std::printf("Error trying to open file %s", name);
+        std::exit(1);
+    }
+
+    std::size_t bites_to_read = sizeof(elf_hdr);
+
+    struct elf_hdr * header = (struct elf_hdr*)std::malloc(bites_to_read);
+
+    std::fread(header, bites_to_read, 1, file);
+
+    std::fclose(file);
+
+    return header->e_entry;
 }
 
 std::size_t space(const char *name)
 {
-    // Ваш код здесь, name - имя ELF файла, с которым вы работаете
-    // вернуть нужно количество байт, необходимых, чтобы загрузить
-    // приложение в память
+    std::FILE *file = std::fopen(name, "r");
+
+    if (!file)
+    {
+        std::printf("Error trying to open file %s", name);
+        std::exit(1);
+    }
+
+    std::size_t bites_to_read = sizeof(elf_hdr);
+
+    struct elf_hdr *header = (struct elf_hdr *)std::malloc(bites_to_read);
+
+    std::fread(header, bites_to_read, 1, file);
+
+    std::fseek(file, header->e_phoff, SEEK_SET);
+
+    struct elf_phdr *pg_header = (struct elf_phdr *)std::malloc(
+        sizeof(struct elf_phdr) * header->e_phnum);
+
+    std::fread(pg_header, sizeof(struct elf_phdr), header->e_phnum, file);
+
+    size_t sum = 0;
+    for (int i = 0; i < header->e_phnum; i++)
+    {
+        struct elf_phdr *cur_pg_header = pg_header + i;
+
+        if (cur_pg_header->p_type == PT_LOAD)
+        {
+            sum += cur_pg_header->p_memsz;
+        }
+    }
+
+    std::fclose(file);
+
+    return sum;
 }
